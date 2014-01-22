@@ -13,9 +13,6 @@ from time import strftime
 
 ############################################################################################################
 # Variáveis estáticas globais
-# DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --file=%s --no-password --format=custom --compress=9 %s"
-# DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --file=%s --no-password %s"
-# Teste
 DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --no-password %s | gzip > %s"
 DATE_FORMAT = "%Y%m%d"
 ARQUIVO_DE_LOG  = os.path.join(os.path.dirname(os.path.realpath(__file__)),'backup.log') 
@@ -74,9 +71,6 @@ def adiciona_notificacao_por_email(mailconfig):
 def realiza_backup_da_base(ip, porta, usuario, senha, base):
     log.info("====================[ %s:%s/%s ]====================" % (ip, porta, base))
     data    = str(strftime(DATE_FORMAT)) 
-    # Teste
-    # arquivo = "/tmp/%s_%s.sql.pgdump" % (base, data)
-    # command = DUMP_CMD % (ip, porta, usuario, arquivo, base)
     arquivo = "/tmp/%s_%s.sql.pgdump.gz" % (base, data)
     command = DUMP_CMD % (ip, porta, usuario, base, arquivo)
     log.debug(command)
@@ -92,8 +86,6 @@ def move_arquivo_para_pasta_destino(arquivo_backup, pasta_destino, base):
     if not os.path.isdir(os.path.join(pasta_destino,base)):
         os.mkdir(os.path.join(pasta_destino,base))
     data = str(strftime(DATE_FORMAT)) 
-    # Teste
-    # arquivo_destino = os.path.join(pasta_destino, base, "%s_%s_%s.sql.pgdump"%(base,data,md5))
     arquivo_destino = os.path.join(pasta_destino, base, "%s_%s_%s.sql.pgdump.gz"%(base,data,md5))
     # Move arquivo_backup para a pasta_destino com o nome "BASE_YYYYMMDD_MD5.bkp.gz"
     log.info("Copiando: %s => %s" % (arquivo_backup, arquivo_destino))
