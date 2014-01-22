@@ -87,6 +87,7 @@ Para agendar a execução dos backups, criar no CRON do servidor:
 
 A estrutura de pastas e arquivos de backup ficaria assim: 
 
+```
 /pasta/do/backup/
     |_diario
     |    |_BASE_1
@@ -110,3 +111,4 @@ A estrutura de pastas e arquivos de backup ficaria assim:
             |_BASE_4_YYYYMMDD_MD5.bkp 
             |_BASE_4_YYYYMMDD_MD5.bkp 
             ... até o limíte de 12 arquivos, informado na propriedade "limite_arquivos" 
+```
