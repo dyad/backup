@@ -33,6 +33,7 @@ Exemplos
 ======
 Exemplo de configuração para backups diários, semanais e mensais:
 Arquivos de configuração:
+
     //backup_diario.cfg
     { 
         "pasta":"/pasta/do/backup/diario",
@@ -79,6 +80,7 @@ Arquivos de configuração:
     }
 
 Para agendar a execução dos backups, criar no CRON do servidor:
+
     Diario:     backup_dyad.py --config=backup_diario.cfg  
     Semanal:    backup_dyad.py --config=backup_semanal.cfg 
     Mensal:     backup_dyad.py --config=backup_mensal.cfg  
