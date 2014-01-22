@@ -9,14 +9,16 @@ import argparse
 import textwrap
 import subprocess
 import logging, logging.handlers
-from time import gmtime, strftime
+from time import strftime
 
 ############################################################################################################
 # Variáveis estáticas globais
-DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --file=%s --no-password --format=custom --compress=9 %s"
-DATE_FORMAT = "%Y%m%d%H%M%S"
+# DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --file=%s --no-password --format=custom --compress=9 %s"
+# DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --file=%s --no-password %s"
+# Teste
+DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --no-password %s | gzip > %s"
+DATE_FORMAT = "%Y%m%d"
 ARQUIVO_DE_LOG  = os.path.join(os.path.dirname(os.path.realpath(__file__)),'backup.log') 
-
 
 ############################################################################################################
 # Configuracao de parâmetros e help da aplicação
@@ -41,17 +43,20 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--config',   required=True,  help='Arquivo JSON de configuração do backup')
 parser.add_argument('--loglevel', required=False, help='Nível de log da aplicação')
 
-
 ############################################################################################################
 # Configurações de log da aplicação...
+# Primeiro apenas cria a variavel global "log". A configuração mesmo foi movida para a função "configura_log".
 # Salva o log da aplicação em um arquivo chamado "backup.log" na mesma pasta desse script.
 # Ao atingir o tamanho limite de 5MB, o arquivo é salvo com o nome "backup.log.1". 
 # Se ja existir um arquivo com esse nome(backup.log.1), esse passará a se chamar "backup.log.2" e o 
 # "backup.log" passará a ser o "backup.log.1" e assim por diante até um limíte de 5 arquivos.
 log = logging.getLogger('BACKUP_LOG')
 
+############################################################################################################
+# Funções da aplicação
+
 def configura_log():
-    formato_do_log  = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S')
+    formato_do_log  = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     manipulador     = logging.handlers.RotatingFileHandler( ARQUIVO_DE_LOG, maxBytes=5000000, backupCount=5)
     manipulador.setLevel(logging.DEBUG)
     manipulador.setFormatter(formato_do_log)
@@ -69,12 +74,13 @@ def adiciona_notificacao_por_email(mailconfig):
 def realiza_backup_da_base(ip, porta, usuario, senha, base):
     log.info("====================[ %s:%s/%s ]====================" % (ip, porta, base))
     data    = str(strftime(DATE_FORMAT)) 
-    arquivo = "/tmp/%s_%s.sql.pgdump" % (base, data)
-    command = DUMP_CMD % (ip, porta, usuario, arquivo, base)
-    command_teste = 'echo "teste %s" > %s' % (data, arquivo)
+    # Teste
+    # arquivo = "/tmp/%s_%s.sql.pgdump" % (base, data)
+    # command = DUMP_CMD % (ip, porta, usuario, arquivo, base)
+    arquivo = "/tmp/%s_%s.sql.pgdump.gz" % (base, data)
+    command = DUMP_CMD % (ip, porta, usuario, base, arquivo)
     log.debug(command)
-    # subprocess.call(command, shell=True)
-    subprocess.call(command_teste,shell = True)
+    subprocess.call(command, shell=True)
     return arquivo
 
 def move_arquivo_para_pasta_destino(arquivo_backup, pasta_destino, base):
@@ -86,14 +92,16 @@ def move_arquivo_para_pasta_destino(arquivo_backup, pasta_destino, base):
     if not os.path.isdir(os.path.join(pasta_destino,base)):
         os.mkdir(os.path.join(pasta_destino,base))
     data = str(strftime(DATE_FORMAT)) 
-    arquivo_destino = os.path.join(pasta_destino, base, "%s_%s_%s.sql.pgdump"%(base,data,md5))
+    # Teste
+    # arquivo_destino = os.path.join(pasta_destino, base, "%s_%s_%s.sql.pgdump"%(base,data,md5))
+    arquivo_destino = os.path.join(pasta_destino, base, "%s_%s_%s.sql.pgdump.gz"%(base,data,md5))
     # Move arquivo_backup para a pasta_destino com o nome "BASE_YYYYMMDD_MD5.bkp.gz"
     log.info("Copiando: %s => %s" % (arquivo_backup, arquivo_destino))
     shutil.move(arquivo_backup, arquivo_destino)
 
 def verifica_limite_arquivos(pasta_destino, base, qtd_limite):
     pasta = os.path.join(pasta_destino, base)
-    filtro_de_busca = "%s/%s_*.sql.pgdump"%(pasta, base)
+    filtro_de_busca = "%s/%s_*.sql.pgdump.gz"%(pasta, base)
     lista_de_arquivos = glob.glob(filtro_de_busca)
     lista_de_arquivos.sort(reverse=True)
     if len(lista_de_arquivos) is 0:
@@ -144,7 +152,6 @@ def main( filename ):
     # if mailconfig:
     #     adiciona_notificacao_por_email(mailconfig)
     realiza_backup_dos_hosts(config)    
-
 
 ############################################################################################################
 # Inicio da execução
