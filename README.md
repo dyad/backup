@@ -4,7 +4,7 @@ backup
 Ferramenta de backups da Dyad.
 
 Essa ferramenta foi desenvolvida com o objetivo de facilitar o processo de backup das várias bases postgres que temos na empresa.
-As necessidades a motivaram:
+As necessidades que a motivaram:
 - Um mesmo script que possa ser utilizado em diferentes servidores.
 - Um mesmo script possa ser utilizado nos vários tipos de backup: diários, semanais, mensais etc.
 - Colocar a informação sobre as bases em um arquivo de configuração simples, que pode ser alterado por pessoas sem conhecimento de desenvolvimento.
@@ -24,10 +24,10 @@ Será criada uma pasta chamada "backup" contendo o script "backup.py".
 Utilização
 ======
 Para exibir a ajuda:
-$ ./backup.py --help
+	$ ./backup.py --help
 
-Para executar um backup
-$ ./backup.py --config=config.cfg
+Para executar um backup:
+	$ ./backup.py --config=config.cfg
 
 Exemplos
 ======
@@ -79,11 +79,11 @@ Arquivos de configuração:
         ]
     }
 
-Para agendar a execução dos backups, criar no CRON do servidor:
+Para agendar a execução dos backups, criar no CRON do usuário postgres:
 
-    Diario:     backup_dyad.py --config=backup_diario.cfg  
-    Semanal:    backup_dyad.py --config=backup_semanal.cfg 
-    Mensal:     backup_dyad.py --config=backup_mensal.cfg  
+    Diario:     backup.py --config=backup_diario.cfg  
+    Semanal:    backup.py --config=backup_semanal.cfg 
+    Mensal:     backup.py --config=backup_mensal.cfg  
 
 A estrutura de pastas e arquivos de backup ficaria assim: 
 
