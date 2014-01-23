@@ -13,7 +13,7 @@ from time import strftime
 
 ############################################################################################################
 # Variáveis estáticas globais
-DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --no-password %s | gzip > %s"
+DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --password=%s %s | gzip > %s"
 DATE_FORMAT = "%Y%m%d"
 ARQUIVO_DE_LOG  = os.path.join(os.path.dirname(os.path.realpath(__file__)),'backup.log') 
 
@@ -72,7 +72,7 @@ def realiza_backup_da_base(ip, porta, usuario, senha, base):
     log.info("====================[ %s:%s/%s ]====================" % (ip, porta, base))
     data    = str(strftime(DATE_FORMAT)) 
     arquivo = "/tmp/%s_%s.sql.pgdump.gz" % (base, data)
-    command = DUMP_CMD % (ip, porta, usuario, base, arquivo)
+    command = DUMP_CMD % (ip, porta, usuario, senha, base, arquivo)
     log.debug(command)
     subprocess.call(command, shell=True)
     return arquivo
