@@ -57,17 +57,22 @@ parser.add_argument('--loglevel', required=False, help='Nível de log da aplica�
 # Ao atingir o tamanho limite de 5MB, o arquivo é salvo com o nome "backup.log.1". 
 # Se ja existir um arquivo com esse nome(backup.log.1), esse passará a se chamar "backup.log.2" e o 
 # "backup.log" passará a ser o "backup.log.1" e assim por diante até um limíte de 5 arquivos.
-log = logging.getLogger('BACKUP_LOG')
+log             = logging.getLogger('BACKUP_LOG')
+formato_do_log  = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+manipulador     = logging.handlers.RotatingFileHandler( ARQUIVO_DE_LOG, maxBytes=5000000, backupCount=5)
+manipulador.setLevel(logging.DEBUG)
+manipulador.setFormatter(formato_do_log)
+log.addHandler(manipulador)
 
 ############################################################################################################
 # Funções da aplicação
 
-def configura_log():
-    formato_do_log  = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    manipulador     = logging.handlers.RotatingFileHandler( ARQUIVO_DE_LOG, maxBytes=5000000, backupCount=5)
-    manipulador.setLevel(logging.DEBUG)
-    manipulador.setFormatter(formato_do_log)
-    log.addHandler(manipulador)
+# def configura_log():
+#     formato_do_log  = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+#     manipulador     = logging.handlers.RotatingFileHandler( ARQUIVO_DE_LOG, maxBytes=5000000, backupCount=5)
+#     manipulador.setLevel(logging.DEBUG)
+#     manipulador.setFormatter(formato_do_log)
+#     log.addHandler(manipulador)
 
 def adiciona_notificacao_por_email(mailconfig):
     mailhandler = logging.handlers.SMTPHandler(
@@ -167,7 +172,7 @@ if __name__ == '__main__':
         # Faz o parse dos argumentos passados...
         args = parser.parse_args()
         
-        configura_log()
+        # configura_log()
         
         # Alteração do nivel de log ...
         numeric_level = logging.DEBUG
