@@ -11,9 +11,19 @@ import subprocess
 import logging, logging.handlers
 from time import strftime
 
+# TODO
+# - Ver como passar os parametros completos para o pg_dump, pq passando só usuario ele pede a senha no terminal. 
+#   Se passarmos usuario e senha ele da um erro informando que nao pode passar senha. 
+# - Testar o backup de bases em outras maquinas da rede
+# - Mostrar no log o tamanho do arquivo gerado
+# - Testar a geração direto na pasta de destino, e depois só renomear
+# - Testar o envio do arquivo de log principal por email
+# - Incluir um código ou descrição no arquivo de configuração, para ser utilizado no log 
+
 ############################################################################################################
 # Variáveis estáticas globais
-DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --password=%s %s | gzip > %s"
+# DUMP_CMD = "pg_dump --host=%s --port=%s --username=%s --password=%s %s | gzip > %s"
+DUMP_CMD = "pg_dump %s | gzip > %s"
 DATE_FORMAT = "%Y%m%d"
 ARQUIVO_DE_LOG  = os.path.join(os.path.dirname(os.path.realpath(__file__)),'backup.log') 
 
@@ -72,7 +82,8 @@ def realiza_backup_da_base(ip, porta, usuario, senha, base):
     log.info("====================[ %s:%s/%s ]====================" % (ip, porta, base))
     data    = str(strftime(DATE_FORMAT)) 
     arquivo = "/tmp/%s_%s.sql.pgdump.gz" % (base, data)
-    command = DUMP_CMD % (ip, porta, usuario, senha, base, arquivo)
+    # command = DUMP_CMD % (ip, porta, usuario, senha, base, arquivo)
+    command = DUMP_CMD % (base, arquivo)
     log.debug(command)
     subprocess.call(command, shell=True)
     return arquivo
